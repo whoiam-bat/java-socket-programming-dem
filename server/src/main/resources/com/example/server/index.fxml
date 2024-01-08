@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<AnchorPane fx:id="pane" prefHeight="528.0" prefWidth="554.0" style="-fx-background-color: #C2FFC2;"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.server.ServerController">
+    <children>
+        <ScrollPane fx:id="scrollPane" layoutX="17.0" layoutY="61.0" prefHeight="406.0" prefWidth="520.0"
+                    style="-fx-background-color: #5F7D60;">
+            <content>
+                <VBox fx:id="vBox" prefHeight="391.0" prefWidth="503.0" style="-fx-background-color: #FFF3C2;"/>
+            </content>
+        </ScrollPane>
+        <TextField fx:id="txtMsg" layoutX="55.0" layoutY="480.0" onAction="#txtMsgOnAction" prefHeight="26.0"
+                   prefWidth="390.0">
+            <font>
+                <Font name="Roboto Solid" size="15.0"/>
+            </font>
+        </TextField>
+
+        <Label layoutX="35.0" layoutY="19.0" text="Socket-Chat" textFill="#0d47a1">
+            <font>
+                <Font name="Comic Sans MS" size="20.0"/>
+            </font>
+        </Label>
+        <Label fx:id="txtLabel" layoutX="480.0" layoutY="19.0" text="Server" textFill="#2b50c9">
+            <font>
+                <Font name="Comic Sans MS" size="18.0"/>
+            </font>
+        </Label>
+        <Button layoutX="465.0" layoutY="480.0" mnemonicParsing="false" onAction="#sendButtonOnAction" prefHeight="26.0"
+                prefWidth="60.0" style="-fx-background-color: #FFF3C2;" text="Send" textFill="#2b50c9">
+            <font>
+                <Font name="Comic Sans MS" size="14.0"/>
+            </font>
+        </Button>
+    </children>
+</AnchorPane>
