@@ -2,15 +2,22 @@ package com.example.server;
 
 import javafx.scene.layout.VBox;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Properties;
 
 public class Server {
 
     @Getter
+    @Setter
     private String serverName;
+
+    @Getter
+    @Setter
+    private int port;
 
     private ServerSocket serverSocket;
 
@@ -21,14 +28,18 @@ public class Server {
     private BufferedWriter bufferedWriter;
 
 
-    public Server(ServerSocket serverSocket) {
+    public Server() {
         try {
-            this.serverSocket = serverSocket;
+            this.serverSocket = new ServerSocket(port);
+            System.out.println("Server " + serverName + " is running on: " + port + " port.");
+
             this.socket = serverSocket.accept();
+            System.out.println("Client connected.");
+
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
-            System.err.println("Error creating server.\n" + e.getLocalizedMessage());
+            System.err.println("Error creating server: " + e.getLocalizedMessage());
             closeResources();
         }
     }
@@ -67,9 +78,23 @@ public class Server {
                 bufferedReader.close();
             if (socket != null)
                 socket.close();
+
+            System.out.println("Client connection closed.");
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
         }
     }
 
+    private void loadProperties() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+            Properties props = new Properties();
+            props.load(input);
+
+            serverName = props.getProperty("server.name");
+            port = Integer.parseInt(props.getProperty("server.port"));
+
+        } catch (IOException e) {
+            System.err.println("Error reading property file: " + e.getMessage());
+        }
+    }
 }
