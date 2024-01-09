@@ -49,6 +49,7 @@ public class Client {
             bufferedWriter.newLine();
             bufferedWriter.flush();
         } catch (IOException e) {
+            ClientController.showError(e.getLocalizedMessage());
             System.err.println("Error sending message: " + e.getLocalizedMessage());
             closeResources();
         }
