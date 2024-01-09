@@ -16,8 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.net.URL;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -40,18 +38,20 @@ public class ClientController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            client = new Client(new Socket("localhost", 54123));
-            System.out.println("Connected to server.");
-        } catch (IOException e) {
-            System.err.println("Error creating server: " + e.getLocalizedMessage());
-        }
+        client = new Client();
+
+        txtLabel.setText(client.getClientName());
 
         // Scroll VBox pane to the bottom when new message is received
         vBox.heightProperty().addListener((observableValue, oldValue, newValue) -> {
             scrollPane.setVvalue((Double) newValue);
         });
 
+        /*
+            Wil be run in the separate thread, because waiting for messages is blocking operation.
+            With this approach program will be able to execute other functionality
+            not only waiting for messages from client.
+         */
         client.receiveMsgFromServer(vBox);
     }
 
@@ -67,34 +67,18 @@ public class ClientController implements Initializable {
 
     public void sendMessage(String messageToSend) {
         if (!messageToSend.isEmpty()) {
-            HBox hBox = new HBox();
-            hBox.setAlignment(Pos.CENTER_RIGHT);
-            hBox.setPadding(new Insets(5, 5, 0, 10));
+            HBox hBox = createMessageBox(
+                    messageToSend,
+                    Pos.CENTER_RIGHT,
+                    """
+                                -fx-background-color: #0693e3;
+                                -fx-font-weight: bold;
+                                -fx-color: white;
+                                -fx-background-radius: 20px;
+                            """
+            );
 
-            Text text = new Text(messageToSend);
-            text.setStyle("-fx-font-size: 14");
-            TextFlow textFlow = new TextFlow(text);
-
-            textFlow.setStyle("""
-                        -fx-background-color: #0693e3;
-                        -fx-font-weight: bold;
-                        -fx-color: white;
-                        -fx-background-radius: 20px;
-                    """);
-
-            textFlow.setPadding(new Insets(5, 10, 5, 10));
-            text.setFill(Color.color(1, 1, 1));
-
-            hBox.getChildren().add(textFlow);
-
-            HBox hBoxTime = new HBox();
-            hBoxTime.setAlignment(Pos.CENTER_RIGHT);
-            hBoxTime.setPadding(new Insets(0, 5, 5, 10));
-            String stringTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-            Text time = new Text(stringTime);
-            time.setStyle("-fx-font-size: 8");
-
-            hBoxTime.getChildren().add(time);
+            HBox hBoxTime = createTimeBox(Pos.CENTER_RIGHT);
 
             vBox.getChildren().add(hBox);
             vBox.getChildren().add(hBoxTime);
@@ -106,27 +90,45 @@ public class ClientController implements Initializable {
     }
 
     public static void receiveMessage(String messageToReceive, VBox vbox) {
+        HBox hBox = createMessageBox(
+                messageToReceive,
+                Pos.CENTER_LEFT,
+                """
+                            -fx-background-color: #abb8c3;
+                            -fx-font-weight: bold;
+                            -fx-background-radius: 20px;
+                        """
+        );
+
+        HBox hBoxTime = createTimeBox(Pos.CENTER_LEFT);
+
+        Platform.runLater(() -> {
+            vbox.getChildren().add(hBox);
+            vbox.getChildren().add(hBoxTime);
+        });
+    }
+
+    private static HBox createMessageBox(String message, Pos alignment, String styles) {
         HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setAlignment(alignment);
         hBox.setPadding(new Insets(5, 5, 0, 10));
 
-        Text text = new Text(messageToReceive);
+        Text text = new Text(message);
         text.setStyle("-fx-font-size: 14");
         TextFlow textFlow = new TextFlow(text);
 
-        textFlow.setStyle("""
-                        -fx-background-color: #abb8c3;
-                        -fx-font-weight: bold;
-                        -fx-background-radius: 20px;
-                    """);
-
+        textFlow.setStyle(styles);
         textFlow.setPadding(new Insets(5, 10, 5, 10));
         text.setFill(Color.color(1, 1, 1));
 
         hBox.getChildren().add(textFlow);
 
+        return hBox;
+    }
+
+    private static HBox createTimeBox(Pos alignment) {
         HBox hBoxTime = new HBox();
-        hBoxTime.setAlignment(Pos.CENTER_LEFT);
+        hBoxTime.setAlignment(alignment);
         hBoxTime.setPadding(new Insets(0, 5, 5, 10));
         String stringTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
         Text time = new Text(stringTime);
@@ -134,13 +136,7 @@ public class ClientController implements Initializable {
 
         hBoxTime.getChildren().add(time);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                vbox.getChildren().add(hBox);
-                vbox.getChildren().add(hBoxTime);
-            }
-        });
+        return hBoxTime;
     }
 
 }
