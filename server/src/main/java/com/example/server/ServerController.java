@@ -71,7 +71,6 @@ public class ServerController implements Initializable {
             HBox hBox = createMessageBox(
                     messageToSend,
                     Pos.CENTER_RIGHT,
-                    new Insets(5, 5, 0, 10),
                     """
                                 -fx-background-color: #0693e3;
                                 -fx-font-weight: bold;
@@ -95,7 +94,6 @@ public class ServerController implements Initializable {
         HBox hBox = createMessageBox(
                 messageToReceive,
                 Pos.CENTER_LEFT,
-                new Insets(5, 5, 0, 10),
                 """
                             -fx-background-color: #abb8c3;
                             -fx-font-weight: bold;
@@ -105,24 +103,22 @@ public class ServerController implements Initializable {
 
         HBox hBoxTime = createTimeBox(Pos.CENTER_LEFT);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                vbox.getChildren().add(hBox);
-                vbox.getChildren().add(hBoxTime);
-            }
+        Platform.runLater(() -> {
+            vbox.getChildren().add(hBox);
+            vbox.getChildren().add(hBoxTime);
         });
     }
 
-    private static HBox createMessageBox(String message, Pos alignment, Insets padding, String styles) {
+    private static HBox createMessageBox(String message, Pos alignment, String styles) {
         HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_RIGHT);
+        hBox.setAlignment(alignment);
         hBox.setPadding(new Insets(5, 5, 0, 10));
 
         Text text = new Text(message);
         text.setStyle("-fx-font-size: 14");
         TextFlow textFlow = new TextFlow(text);
 
+        textFlow.setStyle(styles);
         textFlow.setPadding(new Insets(5, 10, 5, 10));
         text.setFill(Color.color(1, 1, 1));
 

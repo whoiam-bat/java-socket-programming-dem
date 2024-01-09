@@ -30,6 +30,7 @@ public class Server {
 
     public Server() {
         try {
+            loadProperties();
             this.serverSocket = new ServerSocket(port);
             System.out.println("Server " + serverName + " is running on: " + port + " port.");
 
